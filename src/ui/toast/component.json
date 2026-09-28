@@ -1,0 +1,7 @@
+{
+  "name": "toast",
+  "description": "toast() / toast.success() / toast.error() + <Toaster />: stacked, swipe to dismiss, undo action, haptics",
+  "dependencies": ["react-native-gesture-handler", "react-native-reanimated", "react-native-worklets", "react-native-safe-area-context", "expo-haptics"],
+  "registryDependencies": [],
+  "minSdk": 57
+}

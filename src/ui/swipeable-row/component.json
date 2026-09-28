@@ -1,0 +1,7 @@
+{
+  "name": "swipeable-row",
+  "description": "Swipe-to-reveal row actions (UI thread): one open row at a time, auto-close, haptic, a11y actions",
+  "dependencies": ["react-native-gesture-handler", "react-native-reanimated", "react-native-worklets", "expo-haptics"],
+  "registryDependencies": [],
+  "minSdk": 57
+}

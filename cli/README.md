@@ -4,10 +4,10 @@ Native-first Expo / React Native components you **copy into your project** — l
 Built on platform UI (NativeTabs, native menus, `@expo/ui`), animations on the UI thread.
 
 ```bash
-npx @ay-code/native-ui add overflow-menu
+npx @ay-code/native-ui add toast swipeable-row
 ```
 
-That's it: files land in `src/ui/overflow-menu/`, missing deps are installed with `npx expo install` (versions matched to your SDK). No `init`, no config file. The code is yours — edit it or keep it as is.
+That's it: files land in `src/ui/<component>/`, missing deps are installed with `npx expo install` (versions matched to your SDK). No `init`, no config file. The code is yours — edit it or keep it as is.
 
 ## Commands
 
@@ -31,6 +31,9 @@ npx @ay-code/native-ui diff <component...>     # your copy vs the latest version
 |---|---|
 | `app-tabs` | Native tab bar from a config (Liquid Glass iOS 26+, Material 3 Android) + native stack per tab |
 | `overflow-menu` | Native `…` / `⋮` header menu: actions, checkmarks, sections, submenus |
+| `pressable-scale` | Press feedback: subtle scale on press-in (UI thread), optional haptic |
+| `swipeable-row` | Swipe-to-reveal row actions, one open row at a time, a11y actions |
+| `toast` | `toast()` from anywhere: stacked, swipe to dismiss, Undo action, haptics |
 
 Each component ships its own `README.md` (usage + API) next to the code.
 

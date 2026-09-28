@@ -13,6 +13,9 @@ npx @ay-code/native-ui add overflow-menu
 |---|---|
 | [`app-tabs`](src/ui/app-tabs/README.md) | Native tab bar from a config (Liquid Glass iOS 26+, Material 3 Android) + native stack per tab |
 | [`overflow-menu`](src/ui/overflow-menu/README.md) | Native `…` / `⋮` header menu: actions, checkmarks, sections, submenus |
+| [`pressable-scale`](src/ui/pressable-scale/README.md) | Press feedback: subtle scale on press-in (UI thread), optional haptic |
+| [`swipeable-row`](src/ui/swipeable-row/README.md) | Swipe-to-reveal row actions, one open row at a time, a11y actions |
+| [`toast`](src/ui/toast/README.md) | `toast()` from anywhere: stacked, swipe to dismiss, Undo action, haptics |
 
 ## Repo
 

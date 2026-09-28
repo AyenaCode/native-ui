@@ -6,6 +6,7 @@ import { Alert, StyleSheet } from 'react-native';
 import { ProjectCard } from '@/components/lists/project-card';
 import { PROJECTS, type Project } from '@/data/mock';
 import { OverflowMenu, type MenuEntry } from '@/ui/overflow-menu';
+import { toast } from '@/ui/toast';
 
 type Layout = 'list' | 'grid';
 type SortBy = 'recent' | 'name' | 'progress';
@@ -51,7 +52,7 @@ export default function HomeScreen() {
     const [kind, value] = id.split(':');
     if (kind === 'layout') setLayout(value as Layout);
     else if (kind === 'sort') setSortBy(value as SortBy);
-    else Alert.alert('New project', 'Coming soon');
+    else toast('New project', { description: 'Coming soon' });
   };
 
   return (

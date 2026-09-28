@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-// Published package ships `registry/`; inside the repo we read `src/ui` directly.
-const REGISTRY = [join(HERE, '../registry'), join(HERE, '../../src/ui')].find(existsSync);
+// Inside the repo, read `src/ui` directly (always fresh); the published package ships `registry/`.
+const REGISTRY = [join(HERE, '../../src/ui'), join(HERE, '../registry')].find(existsSync);
 const MANIFEST = 'component.json';
 const PKG = JSON.parse(readFileSync(join(HERE, '../package.json'), 'utf8'));
 

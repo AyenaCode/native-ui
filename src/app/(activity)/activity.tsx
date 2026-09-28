@@ -7,10 +7,22 @@ import { ListRow } from '@/components/lists/list-row';
 import { useColors } from '@/hooks/use-colors';
 import { notificationsActions, useNotifications } from '@/hooks/use-notifications';
 import { OverflowMenu, type MenuEntry } from '@/ui/overflow-menu';
+import { SwipeableRow, type SwipeAction } from '@/ui/swipeable-row';
+import { toast } from '@/ui/toast';
 
 type ActivityAction = 'unread-only' | 'mark-all-read' | 'reset' | 'clear';
+type RowAction = 'read' | 'delete';
 
-// Demo: toggle option, disabled state, bulk action, destructive action with confirmation. Tab badge follows the store.
+const READ_ACTION: SwipeAction<RowAction>[] = [{ id: 'read', label: 'Read', color: '#3390EC' }];
+const DELETE_ACTION: SwipeAction<RowAction>[] = [{ id: 'delete', label: 'Delete', color: '#FF3B30' }];
+
+function deleteWithUndo(id: string) {
+  const { removed, index } = notificationsActions.remove(id);
+  if (!removed) return;
+  toast('Notification deleted', { action: { label: 'Undo', onPress: () => notificationsActions.restore(removed, index) } });
+}
+
+// Demo: overflow menu (toggle, disabled, destructive), swipeable rows (read / delete + Undo toast). Tab badge follows the store.
 export default function ActivityScreen() {
   const c = useColors();
   const notifications = useNotifications();
@@ -36,7 +48,8 @@ export default function ActivityScreen() {
       case 'unread-only':
         return setUnreadOnly((v) => !v);
       case 'mark-all-read':
-        return notificationsActions.markAllRead();
+        notificationsActions.markAllRead();
+        return toast.success('All caught up', { description: 'Every notification is marked as read.' });
       case 'reset':
         return notificationsActions.reset();
       case 'clear':
@@ -53,14 +66,23 @@ export default function ActivityScreen() {
         data={visible}
         keyExtractor={(n) => n.id}
         renderItem={({ item }) => (
-          <ListRow
-            title={item.title}
-            subtitle={item.body}
-            highlighted={!item.read}
-            leading={<View style={[styles.dot, { backgroundColor: item.read ? 'transparent' : c.accent }]} />}
-            trailing={<Text style={{ color: c.muted }}>{item.time}</Text>}
-            onPress={() => notificationsActions.markRead(item.id)}
-          />
+          <SwipeableRow
+            id={item.id}
+            leftActions={item.read ? [] : READ_ACTION}
+            rightActions={DELETE_ACTION}
+            onAction={(action) => (action === 'read' ? notificationsActions.markRead(item.id) : deleteWithUndo(item.id))}
+          >
+            <View style={{ backgroundColor: c.background }}>
+              <ListRow
+                title={item.title}
+                subtitle={item.body}
+                highlighted={!item.read}
+                leading={<View style={[styles.dot, { backgroundColor: item.read ? 'transparent' : c.accent }]} />}
+                trailing={<Text style={{ color: c.muted }}>{item.time}</Text>}
+                onPress={() => notificationsActions.markRead(item.id)}
+              />
+            </View>
+          </SwipeableRow>
         )}
         ListEmptyComponent={
           <View style={styles.empty}>

@@ -21,6 +21,13 @@ const getSnapshot = () => items;
 export const notificationsActions = {
   markRead: (id: string) => set(items.map((n) => (n.id === id ? { ...n, read: true } : n))),
   markAllRead: () => set(items.map((n) => (n.read ? n : { ...n, read: true }))),
+  remove: (id: string) => {
+    const index = items.findIndex((n) => n.id === id);
+    const removed = items[index];
+    set(items.filter((n) => n.id !== id));
+    return { removed, index };
+  },
+  restore: (item: Notification, index: number) => set([...items.slice(0, index), item, ...items.slice(index)]),
   clear: () => set([]),
   reset: () => set(NOTIFICATIONS),
 };

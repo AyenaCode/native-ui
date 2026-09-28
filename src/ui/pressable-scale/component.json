@@ -1,0 +1,7 @@
+{
+  "name": "pressable-scale",
+  "description": "Press feedback: subtle scale on press-in (UI thread), optional haptic, reduced-motion aware",
+  "dependencies": ["react-native-reanimated", "react-native-worklets", "expo-haptics"],
+  "registryDependencies": [],
+  "minSdk": 57
+}

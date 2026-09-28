@@ -26,7 +26,8 @@ This repo is a **UI library** + a showcase app.
 - Native first: `expo-router` (NativeTabs, Stack.Toolbar), `@expo/ui`, platform components before custom JS UI.
 - Motion on the UI thread only: Reanimated 4 (CSS transitions → layout animations → shared values + Gesture). Never `setState` per frame, never core `Animated`. Ship reduced motion.
 - Lists: FlashList. Short fixed groups: `@expo/ui` `List`.
-- React Compiler is on: no manual `useMemo` / `memo` / `useCallback`.
+- React Compiler is on for the showcase: no manual `useMemo` / `memo` / `useCallback` there. Library code (`src/ui`) must not rely on it — memoize gestures explicitly.
+- Gestures need `GestureHandlerRootView` at the root (say so in the component README).
 
 ## Constraints
 - `ios/` `android/` are generated (CNG, gitignored): never edit. Native config goes in `app.json` / config plugins.
