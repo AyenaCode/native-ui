@@ -1,0 +1,7 @@
+{
+  "name": "skeleton",
+  "description": "Loading placeholders (block, circle, text) with a UI-thread opacity pulse, reduced-motion aware",
+  "dependencies": ["react-native-reanimated", "react-native-worklets"],
+  "registryDependencies": [],
+  "minSdk": 57
+}

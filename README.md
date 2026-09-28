@@ -16,6 +16,7 @@ npx @ay-code/native-ui add overflow-menu
 | [`pressable-scale`](src/ui/pressable-scale/README.md) | Press feedback: subtle scale on press-in (UI thread), optional haptic |
 | [`swipeable-row`](src/ui/swipeable-row/README.md) | Swipe-to-reveal row actions, one open row at a time, a11y actions |
 | [`toast`](src/ui/toast/README.md) | `toast()` from anywhere: stacked, swipe to dismiss, Undo action, haptics |
+| [`skeleton`](src/ui/skeleton/README.md) | Loading placeholders (block, circle, text) with a UI-thread pulse |
 
 ## Repo
 
@@ -31,4 +32,4 @@ node cli/bin/cli.mjs add <c> --cwd <app>          # test the CLI locally
 cd cli && npm version patch --no-git-tag-version  # release: bump, commit, push to main
 ```
 
-CI (`.github/workflows/release.yml`): on push to `main` → lint + typecheck → `npm publish` if the version is new → tag `v<version>`.
+CI (`.github/workflows/release.yml`): on push to `main` → lint + typecheck → `npm stage publish` if the version is new → tag `v<version>`. Then approve it on npmjs.com → **Staged Packages** (2FA).

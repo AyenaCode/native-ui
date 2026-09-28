@@ -1,6 +1,6 @@
 {
   "name": "@ay-code/native-ui",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Native-first, UI-thread Expo / React Native components you copy into your project. Zero config.",
   "keywords": [
     "expo",

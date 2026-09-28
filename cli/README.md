@@ -34,6 +34,7 @@ npx @ay-code/native-ui diff <component...>     # your copy vs the latest version
 | `pressable-scale` | Press feedback: subtle scale on press-in (UI thread), optional haptic |
 | `swipeable-row` | Swipe-to-reveal row actions, one open row at a time, a11y actions |
 | `toast` | `toast()` from anywhere: stacked, swipe to dismiss, Undo action, haptics |
+| `skeleton` | Loading placeholders (block, circle, text) with a UI-thread pulse |
 
 Each component ships its own `README.md` (usage + API) next to the code.
 
