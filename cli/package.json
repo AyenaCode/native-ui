@@ -1,5 +1,5 @@
 {
-  "name": "@aycode/native-ui",
+  "name": "@ay-code/native-ui",
   "version": "0.1.0",
   "description": "Native-first, UI-thread Expo / React Native components you copy into your project. Zero config.",
   "keywords": [
@@ -12,6 +12,15 @@
     "shadcn"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AyenaCode/aycode-ui.git",
+    "directory": "cli"
+  },
+  "homepage": "https://github.com/AyenaCode/aycode-ui#readme",
+  "bugs": {
+    "url": "https://github.com/AyenaCode/aycode-ui/issues"
+  },
   "type": "module",
   "bin": {
     "native-ui": "bin/cli.mjs"

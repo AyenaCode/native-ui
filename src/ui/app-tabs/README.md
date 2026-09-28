@@ -10,7 +10,7 @@ Platform tab bar: **Liquid Glass on iOS 26+**, **Material 3 on Android**. Switch
 ## Install
 
 ```bash
-npx @aycode/native-ui add app-tabs
+npx @ay-code/native-ui add app-tabs
 ```
 
 ## Usage

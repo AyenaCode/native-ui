@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// @aycode/native-ui — copy native-first Expo UI components into your project. Zero config, zero dependencies.
+// @ay-code/native-ui — copy native-first Expo UI components into your project. Zero config, zero dependencies.
 import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -17,12 +17,12 @@ const paint = (open, close) => (s) => (COLOR ? `\x1b[${open}m${s}\x1b[${close}m`
 const c = { bold: paint(1, 22), dim: paint(2, 22), green: paint(32, 39), yellow: paint(33, 39), red: paint(31, 39) };
 
 const HELP = `
-${c.bold('@aycode/native-ui')} ${c.dim(`v${PKG.version}`)} — native-first Expo UI components, copied into your project.
+${c.bold('@ay-code/native-ui')} ${c.dim(`v${PKG.version}`)} — native-first Expo UI components, copied into your project.
 
 ${c.bold('Usage')}
-  npx @aycode/native-ui add <component...>   Copy components + install their deps
-  npx @aycode/native-ui list                 Show available components
-  npx @aycode/native-ui diff <component...>  Compare your copy with the latest version
+  npx @ay-code/native-ui add <component...>   Copy components + install their deps
+  npx @ay-code/native-ui list                 Show available components
+  npx @ay-code/native-ui diff <component...>  Compare your copy with the latest version
 
 ${c.bold('Options')}
   -p, --path <dir>   Target folder        ${c.dim('(default: src/ui, or ui/ without src/)')}
@@ -62,7 +62,7 @@ function resolveTree(names) {
   const visit = (name, from) => {
     if (ordered.some((m) => m.name === name)) return;
     const manifest = readManifest(name);
-    if (!manifest) fail(`Unknown component "${name}"${from ? ` (required by ${from})` : ''}. Run ${c.bold('npx @aycode/native-ui list')}.`);
+    if (!manifest) fail(`Unknown component "${name}"${from ? ` (required by ${from})` : ''}. Run ${c.bold('npx @ay-code/native-ui list')}.`);
     (manifest.registryDependencies ?? []).forEach((dep) => visit(dep, name));
     ordered.push(manifest);
   };
@@ -94,7 +94,7 @@ function importHint(cwd, target, name, hasAtAlias) {
 function list() {
   console.log(`\n${c.bold('Available components')}\n`);
   for (const m of allComponents()) console.log(`  ${c.green(m.name.padEnd(18))} ${m.description}`);
-  console.log(`\n${c.dim('npx @aycode/native-ui add <component>')}\n`);
+  console.log(`\n${c.dim('npx @ay-code/native-ui add <component>')}\n`);
 }
 
 function add(names, opts) {
@@ -168,8 +168,8 @@ function diff(names, opts) {
     }
   }
   console.log();
-  if (outdated.length) console.log(c.dim(`Take the latest (replaces your edits): npx @aycode/native-ui add ${outdated.join(' ')} --overwrite`));
-  if (missing.length) console.log(c.dim(`Install: npx @aycode/native-ui add ${missing.join(' ')}`));
+  if (outdated.length) console.log(c.dim(`Take the latest (replaces your edits): npx @ay-code/native-ui add ${outdated.join(' ')} --overwrite`));
+  if (missing.length) console.log(c.dim(`Install: npx @ay-code/native-ui add ${missing.join(' ')}`));
   if (!outdated.length && !missing.length) console.log(`${c.green('✓')} Up to date.`);
   console.log();
 }
@@ -205,6 +205,6 @@ if (!REGISTRY) fail('Registry not found — broken install.');
 if (opts.help || !command) console.log(HELP);
 else if (command === 'list' || command === 'ls') list();
 else if (command === 'add' || command === 'diff') {
-  if (names.length === 0) fail(`Which component? ${c.dim(`e.g. npx @aycode/native-ui ${command} overflow-menu`)} — see ${c.bold('npx @aycode/native-ui list')}.`);
+  if (names.length === 0) fail(`Which component? ${c.dim(`e.g. npx @ay-code/native-ui ${command} overflow-menu`)} — see ${c.bold('npx @ay-code/native-ui list')}.`);
   (command === 'add' ? add : diff)(names, opts);
 } else fail(`Unknown command "${command}".\n${HELP}`);

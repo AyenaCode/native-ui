@@ -1,10 +1,10 @@
-# @aycode/native-ui
+# @ay-code/native-ui
 
 Native-first Expo / React Native components you **copy into your project** — like shadcn/ui, with zero config.
 Built on platform UI (NativeTabs, native menus, `@expo/ui`), animations on the UI thread.
 
 ```bash
-npx @aycode/native-ui add overflow-menu
+npx @ay-code/native-ui add overflow-menu
 ```
 
 That's it: files land in `src/ui/overflow-menu/`, missing deps are installed with `npx expo install` (versions matched to your SDK). No `init`, no config file. The code is yours — edit it or keep it as is.
@@ -12,9 +12,9 @@ That's it: files land in `src/ui/overflow-menu/`, missing deps are installed wit
 ## Commands
 
 ```bash
-npx @aycode/native-ui list                    # available components
-npx @aycode/native-ui add <component...>      # copy + install deps
-npx @aycode/native-ui diff <component...>     # your copy vs the latest version
+npx @ay-code/native-ui list                    # available components
+npx @ay-code/native-ui add <component...>      # copy + install deps
+npx @ay-code/native-ui diff <component...>     # your copy vs the latest version
 ```
 
 | Option | |

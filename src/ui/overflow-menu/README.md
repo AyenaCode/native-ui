@@ -10,7 +10,7 @@ Header "more" menu (`…` iOS / `⋮` Android) declared from data. 100 % native:
 ## Install
 
 ```bash
-npx @aycode/native-ui add overflow-menu
+npx @ay-code/native-ui add overflow-menu
 ```
 
 ## Usage

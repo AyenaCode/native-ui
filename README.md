@@ -4,7 +4,7 @@ Personal UI library for Expo / React Native: native-first, optimized, animations
 Distributed shadcn-style — components are copied into your project, you own the code.
 
 ```bash
-npx @aycode/native-ui add overflow-menu
+npx @ay-code/native-ui add overflow-menu
 ```
 
 ## Components
@@ -20,7 +20,7 @@ npx @aycode/native-ui add overflow-menu
 |---|---|
 | `src/ui/<component>/` | Components — source of truth (+ `component.json` manifest) |
 | `src/app/` | Showcase app using every component |
-| `cli/` | The `@aycode/native-ui` npm package (CLI + registry snapshot of `src/ui`) |
+| `cli/` | The `@ay-code/native-ui` npm package (CLI + registry snapshot of `src/ui`) |
 
 ```bash
 npx expo start                                   # showcase
