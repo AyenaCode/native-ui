@@ -1,6 +1,8 @@
 import { Stack } from 'expo-router';
+import type { ComponentProps } from 'react';
 import { Platform } from 'react-native';
-import type { SFSymbol } from 'sf-symbols-typescript';
+
+type SFSymbol = Extract<ComponentProps<typeof Stack.Toolbar.MenuAction>['icon'], string>;
 
 export type MenuAction<Id extends string = string> = {
   id: Id;
@@ -25,16 +27,17 @@ export type MenuGroup<Id extends string = string> = {
 
 export type MenuEntry<Id extends string = string> = MenuAction<Id> | MenuGroup<Id>;
 
-type Props<Id extends string> = {
+export type OverflowMenuProps<Id extends string> = {
   items: readonly MenuEntry<Id>[];
   onAction: (id: Id) => void;
+  placement?: 'left' | 'right';
   accessibilityLabel?: string;
 };
 
 const IS_IOS = Platform.OS === 'ios';
 
 // iOS: native "…" SF Symbol. Android: Material "⋮" vector drawable (SF Symbols are dropped there).
-const TRIGGER_ICON = IS_IOS ? 'ellipsis' : require('@/assets/icons/more-vert.xml');
+const TRIGGER_ICON = IS_IOS ? 'ellipsis' : require('./assets/more-vert.xml');
 
 const isGroup = <Id extends string>(entry: MenuEntry<Id>): entry is MenuGroup<Id> => 'items' in entry;
 
@@ -63,21 +66,20 @@ function renderEntry<Id extends string>(entry: MenuEntry<Id>, onAction: (id: Id)
 }
 
 /**
- * Header "more" menu (⋮ / …), declared from a screen. Fully native — UIMenu on iOS,
- * Compose DropdownMenu on Android — so open/close animations cost zero JS.
- * Supports actions, checkmarks, sections (`inline` groups) and submenus. Renders nothing when `items` is empty.
- *
- * @example
- * <OverflowMenu
- *   items={[{ title: 'Sort by', inline: true, items: [{ id: 'name', title: 'Name', isOn: true }] }, { id: 'delete', title: 'Delete', destructive: true }]}
- *   onAction={(id) => …}
- * />
+ * Header "more" menu (⋮ / …), declared from a Stack screen. Fully native — UIMenu on iOS,
+ * Compose DropdownMenu on Android — so open/close animations run on the UI thread, zero JS.
+ * Renders nothing when `items` is empty. See README.md.
  */
-export function OverflowMenu<Id extends string>({ items, onAction, accessibilityLabel = 'More options' }: Props<Id>) {
+export function OverflowMenu<Id extends string>({
+  items,
+  onAction,
+  placement = 'right',
+  accessibilityLabel = 'More options',
+}: OverflowMenuProps<Id>) {
   if (items.length === 0) return null;
 
   return (
-    <Stack.Toolbar placement="right">
+    <Stack.Toolbar placement={placement}>
       <Stack.Toolbar.Menu icon={TRIGGER_ICON} accessibilityLabel={accessibilityLabel}>
         {items.map((entry, i) => renderEntry(entry, onAction, String(i)))}
       </Stack.Toolbar.Menu>

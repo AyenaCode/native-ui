@@ -1,1 +1,1 @@
-export { TabStack as default } from '@/components/navigation/tab-stack';
+export { TabStack as default } from '@/ui/app-tabs';

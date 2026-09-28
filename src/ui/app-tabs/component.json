@@ -1,0 +1,7 @@
+{
+  "name": "app-tabs",
+  "description": "Native tab bar from a config (Liquid Glass iOS 26+, Material 3 Android) + native stack per tab",
+  "dependencies": ["expo-router"],
+  "registryDependencies": [],
+  "minSdk": 57
+}

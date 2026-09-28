@@ -3,7 +3,7 @@ import { Stack } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar } from '@/components/avatar';
 import { ME } from '@/data/mock';
 import { useColors } from '@/hooks/use-colors';
 

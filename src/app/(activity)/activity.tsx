@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 
 import { ListRow } from '@/components/lists/list-row';
-import { OverflowMenu, type MenuEntry } from '@/components/navigation/overflow-menu';
 import { useColors } from '@/hooks/use-colors';
 import { notificationsActions, useNotifications } from '@/hooks/use-notifications';
+import { OverflowMenu, type MenuEntry } from '@/ui/overflow-menu';
 
 type ActivityAction = 'unread-only' | 'mark-all-read' | 'reset' | 'clear';
 

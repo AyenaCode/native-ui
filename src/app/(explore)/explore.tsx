@@ -3,11 +3,11 @@ import { Stack } from 'expo-router';
 import { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 
+import { Avatar } from '@/components/avatar';
 import { ListRow } from '@/components/lists/list-row';
-import { OverflowMenu, type MenuEntry } from '@/components/navigation/overflow-menu';
-import { Avatar } from '@/components/ui/avatar';
 import { CATEGORY_LABELS, RESOURCES, type Category, type Resource } from '@/data/mock';
 import { useColors } from '@/hooks/use-colors';
+import { OverflowMenu, type MenuEntry } from '@/ui/overflow-menu';
 
 type Filter = Category | 'all';
 

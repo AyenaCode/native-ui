@@ -1,0 +1,7 @@
+{
+  "name": "overflow-menu",
+  "description": "Native … / ⋮ header menu: actions, checkmarks, sections, submenus",
+  "dependencies": ["expo-router", "@expo/ui"],
+  "registryDependencies": [],
+  "minSdk": 57
+}

@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Alert, StyleSheet } from 'react-native';
 
 import { ProjectCard } from '@/components/lists/project-card';
-import { OverflowMenu, type MenuEntry } from '@/components/navigation/overflow-menu';
 import { PROJECTS, type Project } from '@/data/mock';
+import { OverflowMenu, type MenuEntry } from '@/ui/overflow-menu';
 
 type Layout = 'list' | 'grid';
 type SortBy = 'recent' | 'name' | 'progress';
