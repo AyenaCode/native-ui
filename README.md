@@ -1,6 +1,6 @@
-# aycode-ui
+# native-ui
 
-Personal UI library for Expo / React Native: native-first, optimized, animations on the UI thread.
+UI library for Expo / React Native: native-first, optimized, animations on the UI thread.
 Distributed shadcn-style — components are copied into your project, you own the code.
 
 ```bash
