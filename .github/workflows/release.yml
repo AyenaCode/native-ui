@@ -37,6 +37,11 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+
+      # Trusted publishing needs npm >= 11.5.1; early Node 24 builds ship older npm.
+      - name: Upgrade npm
+        run: npm install -g npm@latest && npm --version
 
       - name: Read version
         id: v
