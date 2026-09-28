@@ -1,5 +1,7 @@
-# Push to main → lint + typecheck → publish cli/ to npm (if version is new) → tag v<version>.
-# Release = bump cli/package.json version (`npm version patch --no-git-tag-version`) and push.
+# Push to main → lint + typecheck → stage cli/ on npm (if version is new) → tag v<version>.
+# Release = bump cli/package.json version (`npm version patch --no-git-tag-version`), push,
+# then approve the staged version on npmjs.com → Staged Packages (2FA).
+# The tag marks "already staged or published", so re-pushing never stages twice.
 name: release
 
 on:
@@ -39,7 +41,7 @@ jobs:
           registry-url: https://registry.npmjs.org
           package-manager-cache: false
 
-      # Trusted publishing needs npm >= 11.5.1; early Node 24 builds ship older npm.
+      # `npm stage` needs npm >= 11.15; early Node 24 builds ship older npm.
       - name: Upgrade npm
         run: npm install -g npm@latest && npm --version
 
@@ -50,23 +52,27 @@ jobs:
           NAME=$(node -p "require('./package.json').name")
           VERSION=$(node -p "require('./package.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" >/dev/null; then
+            echo "tagged=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tagged=false" >> "$GITHUB_OUTPUT"
+          fi
           if [ -n "$(npm view "$NAME@$VERSION" version 2>/dev/null)" ]; then
             echo "published=true" >> "$GITHUB_OUTPUT"
           else
             echo "published=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Publish to npm
-        if: steps.v.outputs.published == 'false'
+      # Staged publishing (OIDC): the version waits for a maintainer approval with 2FA.
+      - name: Stage on npm
+        if: steps.v.outputs.published == 'false' && steps.v.outputs.tagged == 'false'
         working-directory: cli
-        run: npm publish
+        run: |
+          node scripts/build-registry.mjs
+          npm stage publish
 
       - name: Tag v${{ steps.v.outputs.version }}
+        if: steps.v.outputs.tagged == 'false'
         run: |
-          TAG="v${{ steps.v.outputs.version }}"
-          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null; then
-            echo "$TAG already exists, skipping"
-          else
-            git tag "$TAG"
-            git push origin "$TAG"
-          fi
+          git tag "v${{ steps.v.outputs.version }}"
+          git push origin "v${{ steps.v.outputs.version }}"
