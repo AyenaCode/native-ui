@@ -23,7 +23,9 @@ npx @ay-code/native-ui add overflow-menu
 | `cli/` | The `@ay-code/native-ui` npm package (CLI + registry snapshot of `src/ui`) |
 
 ```bash
-npx expo start                                   # showcase
+npx expo start                                    # showcase
 node cli/bin/cli.mjs add <c> --cwd <app>          # test the CLI locally
-cd cli && npm publish                            # release (bump version first)
+cd cli && npm version patch --no-git-tag-version  # release: bump, commit, push to main
 ```
+
+CI (`.github/workflows/release.yml`): on push to `main` → lint + typecheck → `npm publish` if the version is new → tag `v<version>`.
