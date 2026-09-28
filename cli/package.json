@@ -14,12 +14,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AyenaCode/aycode-ui.git",
+    "url": "git+https://github.com/AyenaCode/native-ui.git",
     "directory": "cli"
   },
-  "homepage": "https://github.com/AyenaCode/aycode-ui#readme",
+  "homepage": "https://github.com/AyenaCode/native-ui#readme",
   "bugs": {
-    "url": "https://github.com/AyenaCode/aycode-ui/issues"
+    "url": "https://github.com/AyenaCode/native-ui/issues"
   },
   "type": "module",
   "bin": {

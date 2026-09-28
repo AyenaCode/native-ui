@@ -1,4 +1,4 @@
-# aycode-ui
+# native-ui
 
 Expo SDK 57 · React Native 0.86 · React 19.2 · TypeScript · Expo Router (typed routes, React Compiler on). Package manager: **npm**.
 
