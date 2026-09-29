@@ -1,7 +1,7 @@
 # AppTabs + TabStack
 
 Bottom tab bar driven by a config array, with a native stack (header, large title, search, menu) in each tab.
-Platform tab bar: **Liquid Glass on iOS 26+**, **Material 3 on Android**. Push / pop use the native stack transition. On Android, tab switches play the Material **fade-through** (scale 0.92 → 1 + fade, 250 ms) on the UI thread — NativeTabs has no native option for it. iOS keeps the instant platform switch (opt-in).
+Platform tab bar: **Liquid Glass on iOS 26+**, **Material 3 on Android**. Push / pop use the native stack transition. On Android, tab switches play a Material transition on the UI thread — **fade-through** (scale 0.92 → 1 + fade, default) or **shared axis X** (30dp slide from the side of the tab you come from + fade), 250 ms. NativeTabs has no native option for it. iOS keeps the instant platform switch (opt-in).
 
 ## Requirements
 
@@ -77,7 +77,18 @@ Default: `minimizeBehavior="onScrollDown"` (iOS 26). Android styling: `indicator
 
 | Prop | Type | Notes |
 |---|---|---|
-| `transition` | `{ duration?: number; enabled?: boolean }` | fade-through on tab focus. Default `duration: 250`, `enabled`: `true` on Android, `false` on iOS. `enabled: false` = instant switch |
+| `transition` | `{ variant?: 'fade-through' \| 'shared-axis'; duration?: number; enabled?: boolean }` | played on tab focus. Default `variant: 'fade-through'`, `duration: 250`, `enabled`: `true` on Android, `false` on iOS. `enabled: false` = instant switch |
+
+Same transition for every tab: wrap it once and point each tab layout to it.
+
+```tsx
+// src/components/tab-layout.tsx
+export function TabLayout() {
+  return <TabStack transition={{ variant: 'shared-axis' }} />;
+}
+// src/app/(home)/_layout.tsx
+export { TabLayout as default } from '@/components/tab-layout';
+```
 
 Custom tab layout: `useTabTransition(transition)` returns the animated style — put it on an `Animated.View` around your `Stack`.
 
@@ -85,7 +96,7 @@ Custom tab layout: `useTabTransition(transition)` returns the animated style —
 
 ## Notes
 
-- Tab switch: the outgoing tab is hidden natively, only the incoming one animates. The launch tab doesn't animate; every other tab animates from its first visit. Reduced motion: fade only, no scale; push / pop become `animation: 'fade'` (unless `screenOptions.animation` is set).
+- Tab switch: the outgoing tab is hidden natively, only the incoming one animates — which is why `shared-axis` is a short 30dp offset, not a full-width slide (there is no swipe between tabs either: native tab bars have none). Material recommends `fade-through` for bottom navigation; `shared-axis` suits tabs with a strong left-to-right order. The launch tab doesn't animate; every other tab animates from its first visit. Reduced motion: fade only, no scale; push / pop become `animation: 'fade'` (unless `screenOptions.animation` is set).
 - Stack transitions stay native on purpose (interactive back gesture, platform timing). `animationDuration` is iOS-only; on Android pick an `animation` value per screen, or `presentation: 'modal' | 'formSheet'`.
 - Judge smoothness on a release build (`npx expo run:android --variant release`), not Expo Go / dev.
 

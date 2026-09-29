@@ -1,4 +1,4 @@
-import type { TabConfig } from '@/ui/app-tabs';
+import type { TabConfig, TabTransition } from '@/ui/app-tabs';
 
 /** Showcase tabs. Order = display order. */
 export const TABS = [
@@ -7,3 +7,6 @@ export const TABS = [
   { name: '(activity)', label: 'Activity', icon: { sf: { default: 'bell', selected: 'bell.fill' }, md: 'notifications' } },
   { name: '(profile)', label: 'Profile', icon: { sf: { default: 'person', selected: 'person.fill' }, md: 'person' } },
 ] as const satisfies readonly TabConfig[];
+
+/** Tab switch motion for every showcase tab. Try `'fade-through'` (default) or `'shared-axis'`. */
+export const TAB_TRANSITION = { variant: 'shared-axis' } as const satisfies TabTransition;

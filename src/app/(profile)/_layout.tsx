@@ -1,1 +1,1 @@
-export { TabStack as default } from '@/ui/app-tabs';
+export { TabLayout as default } from '@/components/tab-layout';
