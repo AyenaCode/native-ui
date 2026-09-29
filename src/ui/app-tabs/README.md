@@ -68,6 +68,7 @@ Put the `ScrollView` / `FlashList` **first** with `contentInsetAdjustmentBehavio
 |---|---|---|
 | `tabs` | `TabConfig[]` | static, max 5 on Android |
 | `badges` | `Partial<Record<name, number \| string>>` | `0` hides, `> 99` → `99+` |
+| `hiddenTabs` | `Partial<Record<name, boolean>>` | hidden tab = not in the bar and not navigable; a change remounts the tabs (state reset) |
 
 Default: `minimizeBehavior="onScrollDown"` (iOS 26). Android styling: `indicatorColor`, `rippleColor`, `labelVisibilityMode`, `iconColor`, `labelStyle`.
 
@@ -78,5 +79,6 @@ Default: `minimizeBehavior="onScrollDown"` (iOS 26). Android styling: `indicator
 ## Notes
 
 - Wrap the root in `ThemeProvider` (from `expo-router`) to avoid header flicker between tabs.
-- Don't add / remove tabs at runtime — it remounts the navigator.
+- Don't add / remove tabs at runtime — it remounts the navigator. To gate a tab (roles, feature flag), keep it in `tabs` and use `hiddenTabs`; guard the screens pushed from it with `Stack.Protected`. Toggling `hiddenTabs` remounts the navigator too (state reset): resolve the gate before the tabs mount (e.g. behind the splash screen).
+- A hidden tab has no redirect: if its route gets focused (deep link), NativeTabs throws in dev and falls back to the first tab in prod.
 - Screens without a scroll view (e.g. `@expo/ui` `List`): `<Stack.Screen options={{ headerTransparent: false, headerLargeTitleEnabled: false }} />`.

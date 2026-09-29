@@ -13,6 +13,8 @@ export type AppTabsProps<Name extends string> = Omit<NativeTabsProps, 'children'
   tabs: readonly TabConfig<Name>[];
   /** Badge per tab. `0` / `undefined` hides it, values above 99 show `99+`. */
   badges?: Partial<Record<Name, number | string>>;
+  /** Tabs to hide, e.g. by permission: hidden and unreachable. A change remounts the tabs. */
+  hiddenTabs?: Partial<Record<Name, boolean>>;
 };
 
 const formatBadge = (value: number | string) => (typeof value === 'number' && value > 99 ? '99+' : String(value));
@@ -21,13 +23,13 @@ const formatBadge = (value: number | string) => (typeof value === 'number' && va
  * Platform tab bar driven by a config array: Liquid Glass on iOS 26+, Material 3 on Android.
  * Native switching and transitions — no JS animation. See README.md.
  */
-export function AppTabs<Name extends string>({ tabs, badges, ...nativeTabsProps }: AppTabsProps<Name>) {
+export function AppTabs<Name extends string>({ tabs, badges, hiddenTabs, ...nativeTabsProps }: AppTabsProps<Name>) {
   return (
     <NativeTabs minimizeBehavior="onScrollDown" {...nativeTabsProps}>
       {tabs.map((tab) => {
         const badge = badges?.[tab.name];
         return (
-          <NativeTabs.Trigger key={tab.name} name={tab.name}>
+          <NativeTabs.Trigger key={tab.name} name={tab.name} hidden={hiddenTabs?.[tab.name] ?? false}>
             <NativeTabs.Trigger.Icon {...tab.icon} />
             <NativeTabs.Trigger.Label>{tab.label}</NativeTabs.Trigger.Label>
             {badge ? <NativeTabs.Trigger.Badge>{formatBadge(badge)}</NativeTabs.Trigger.Badge> : null}
