@@ -1,11 +1,12 @@
 # AppTabs + TabStack
 
 Bottom tab bar driven by a config array, with a native stack (header, large title, search, menu) in each tab.
-Platform tab bar: **Liquid Glass on iOS 26+**, **Material 3 on Android**. Switching and transitions are native — no JS animation.
+Platform tab bar: **Liquid Glass on iOS 26+**, **Material 3 on Android**. Push / pop use the native stack transition. On Android, tab switches play the Material **fade-through** (scale 0.92 → 1 + fade, 250 ms) on the UI thread — NativeTabs has no native option for it. iOS keeps the instant platform switch (opt-in).
 
 ## Requirements
 
 - Expo SDK 57+ with `expo-router` (`NativeTabs` from `expo-router/unstable-native-tabs`)
+- `react-native-reanimated` 4 + `react-native-worklets` (New Architecture)
 
 ## Install
 
@@ -72,11 +73,21 @@ Put the `ScrollView` / `FlashList` **first** with `contentInsetAdjustmentBehavio
 
 Default: `minimizeBehavior="onScrollDown"` (iOS 26). Android styling: `indicatorColor`, `rippleColor`, `labelVisibilityMode`, `iconColor`, `labelStyle`.
 
-**`TabStack`** — all `Stack` props. `TAB_STACK_OPTIONS` = defaults (large title, transparent header on iOS, minimal back button). Extend: `screenOptions={{ ...TAB_STACK_OPTIONS, headerTintColor }}`.
+**`TabStack`** — all `Stack` props, plus `transition`. `TAB_STACK_OPTIONS` = defaults (large title, transparent header on iOS, minimal back button). Extend: `screenOptions={{ ...TAB_STACK_OPTIONS, headerTintColor }}`.
+
+| Prop | Type | Notes |
+|---|---|---|
+| `transition` | `{ duration?: number; enabled?: boolean }` | fade-through on tab focus. Default `duration: 250`, `enabled`: `true` on Android, `false` on iOS. `enabled: false` = instant switch |
+
+Custom tab layout: `useTabTransition(transition)` returns the animated style — put it on an `Animated.View` around your `Stack`.
 
 **`TabConfig`**: `name` (`'(group)'`), `label`, `icon` (`sf` iOS SF Symbol, `md` Android Material Symbol).
 
 ## Notes
+
+- Tab switch: the outgoing tab is hidden natively, only the incoming one animates. The launch tab doesn't animate; every other tab animates from its first visit. Reduced motion: fade only, no scale; push / pop become `animation: 'fade'` (unless `screenOptions.animation` is set).
+- Stack transitions stay native on purpose (interactive back gesture, platform timing). `animationDuration` is iOS-only; on Android pick an `animation` value per screen, or `presentation: 'modal' | 'formSheet'`.
+- Judge smoothness on a release build (`npx expo run:android --variant release`), not Expo Go / dev.
 
 - Wrap the root in `ThemeProvider` (from `expo-router`) to avoid header flicker between tabs.
 - Don't add / remove tabs at runtime — it remounts the navigator. To gate a tab (roles, feature flag), keep it in `tabs` and use `hiddenTabs`; guard the screens pushed from it with `Stack.Protected`. Toggling `hiddenTabs` remounts the navigator too (state reset): resolve the gate before the tabs mount (e.g. behind the splash screen).
