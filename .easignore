@@ -1,0 +1,81 @@
+# Files NOT uploaded to EAS Build. https://docs.expo.dev/build-reference/easignore/
+# When this file exists EAS ignores .gitignore: its content is copied below — keep both in sync.
+
+# ─── From .gitignore ──────────────────────────────────────────
+# dependencies
+node_modules/
+.npm/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+example
+
+# generated native folders (EAS runs prebuild from app.json)
+/ios
+/android
+
+# aycode-ui CLI build output
+/cli/registry
+/cli/LICENSE
+
+# ─── Not needed by EAS Build ──────────────────────────────────
+# npm CLI package (published separately, not part of the app)
+/cli
+
+# CI, editor, agent and git tooling
+/.git
+/.github
+/.claude
+/.vscode
+/.idea
+/.cursor
+
+# Docs and agent instructions
+/AGENTS.md
+/CLAUDE.md
+/README.md
+/docs
+
+# Tests and reports
+/coverage
+/__tests__
+*.test.ts
+*.test.tsx
+
+# Local build outputs and logs
+*.apk
+*.aab
+*.ipa
+*.log
+build-*.tar.gz
