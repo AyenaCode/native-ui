@@ -77,7 +77,24 @@ Default: `minimizeBehavior="onScrollDown"` (iOS 26). Android styling: `indicator
 
 | Prop | Type | Notes |
 |---|---|---|
-| `transition` | `{ variant?: 'fade-through' \| 'shared-axis'; duration?: number; enabled?: boolean }` | played on tab focus. Default `variant: 'fade-through'`, `duration: 250`, `enabled`: `true` on Android, `false` on iOS. `enabled: false` = instant switch |
+| `transition` | `TabTransition` (below) | played on tab focus; all fields optional |
+
+**`TabTransition`** — defaults are Material's values; keep the object static or inline, both are fine.
+
+| Field | Type | Default | Notes |
+|---|---|---|---|
+| `variant` | `'fade-through' \| 'shared-axis'` | `'fade-through'` | fade-through = scale + fade; shared-axis = side slide + fade, direction from the tab order (mirrored in RTL) |
+| `duration` | `number` (ms) | `250` | |
+| `easing` | Reanimated `EasingFunction` / `Easing.bezier(...)` | `Easing.bezier(0.23, 1, 0.32, 1)` | an ease-out keeps the start snappy; avoid `Easing.in` |
+| `distance` | `number` (dp) | `30` | `shared-axis` slide length |
+| `startScale` | `number` 0–1 | `0.92` | `fade-through` start scale (clamped) |
+| `enabled` | `boolean` | `true` Android · `false` iOS | `false` = instant switch |
+
+```tsx
+import { Easing } from 'react-native-reanimated';
+
+<TabStack transition={{ variant: 'shared-axis', duration: 300, distance: 48, easing: Easing.bezier(0.2, 0, 0, 1) }} />
+```
 
 Same transition for every tab: wrap it once and point each tab layout to it.
 
