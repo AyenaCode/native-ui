@@ -1,6 +1,6 @@
 {
   "name": "app-tabs",
-  "description": "Native tab bar from a config (Liquid Glass iOS 26+, Material 3 Android) + native stack per tab, UI-thread Material tab transitions (fade-through, shared axis)",
+  "description": "Native tab bar from a config (Liquid Glass iOS 26+, Material 3 Android) + native stack per tab, UI-thread Material tab transitions (shared axis, fade-through) with proportional intensity presets",
   "dependencies": [
     "expo-router",
     "react-native-reanimated",

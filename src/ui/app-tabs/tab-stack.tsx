@@ -8,7 +8,7 @@ import { useTabTransition, type TabTransition } from './use-tab-transition';
 type StackProps = ComponentProps<typeof Stack>;
 
 export type TabStackProps = StackProps & {
-  /** Fade-through played when the tab gains focus. `{ enabled: false }` to switch instantly. */
+  /** Material transition played when the tab gains focus (default: shared-axis, strong, reversed). `{ enabled: false }` to switch instantly. */
   transition?: TabTransition;
 };
 

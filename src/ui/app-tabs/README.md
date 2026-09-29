@@ -1,7 +1,7 @@
 # AppTabs + TabStack
 
 Bottom tab bar driven by a config array, with a native stack (header, large title, search, menu) in each tab.
-Platform tab bar: **Liquid Glass on iOS 26+**, **Material 3 on Android**. Push / pop use the native stack transition. On Android, tab switches play a Material transition on the UI thread — **fade-through** (scale 0.92 → 1 + fade, default) or **shared axis X** (30dp slide from the side of the tab you come from + fade), 250 ms. NativeTabs has no native option for it. iOS keeps the instant platform switch (opt-in).
+Platform tab bar: **Liquid Glass on iOS 26+**, **Material 3 on Android**. Push / pop use the native stack transition. On Android, tab switches play a Material transition on the UI thread — by default **shared axis X**, strong and reversed (45dp slide from the side opposite to the tab you come from + fade, 300 ms, Material 3 emphasized decelerate). **Fade-through** (scale + fade) is the alternative. NativeTabs has no native option for it. iOS keeps the instant platform switch (opt-in).
 
 ## Requirements
 
@@ -79,21 +79,24 @@ Default: `minimizeBehavior="onScrollDown"` (iOS 26). Android styling: `indicator
 |---|---|---|
 | `transition` | `TabTransition` (below) | played on tab focus; all fields optional |
 
-**`TabTransition`** — defaults are Material's values; keep the object static or inline, both are fine.
+**`TabTransition`** — every field is optional. Pick an `intensity`: it sets `distance`, `startScale` and `duration` together, kept proportional. Override any of the three directly when needed. Static or inline object, both are fine.
 
 | Field | Type | Default | Notes |
 |---|---|---|---|
-| `variant` | `'fade-through' \| 'shared-axis'` | `'fade-through'` | fade-through = scale + fade; shared-axis = side slide + fade, direction from the tab order (mirrored in RTL) |
-| `duration` | `number` (ms) | `250` | |
-| `easing` | Reanimated `EasingFunction` / `Easing.bezier(...)` | `Easing.bezier(0.23, 1, 0.32, 1)` | an ease-out keeps the start snappy; avoid `Easing.in` |
-| `distance` | `number` (dp) | `30` | `shared-axis` slide length |
-| `startScale` | `number` 0–1 | `0.92` | `fade-through` start scale (clamped) |
+| `variant` | `'shared-axis' \| 'fade-through'` | `'shared-axis'` | shared-axis = side slide + fade, side from the tab order (mirrored in RTL); fade-through = scale + fade |
+| `intensity` | `'subtle' \| 'medium' \| 'strong' \| 'max'` or `number` (dp, 0–90) | `'strong'` | preset (table below), or a slide distance from which the scale and duration are derived |
+| `reverse` | `boolean` | `true` | `shared-axis`: enter from the side opposite to the tab you come from. `false` = from the same side |
+| `duration` | `number` (ms) | from `intensity` | override |
+| `distance` | `number` (dp) | from `intensity` | override. Negative also reverses |
+| `startScale` | `number` 0–1 | from `intensity` | override (clamped) |
+| `easing` | Reanimated `EasingFunction` / `Easing.bezier(...)` | `Easing.bezier(0.1, 0.7, 0.1, 1)` | Material 3 emphasized decelerate; keep a decelerate curve, never `Easing.in` |
 | `enabled` | `boolean` | `true` Android · `false` iOS | `false` = instant switch |
 
 ```tsx
-import { Easing } from 'react-native-reanimated';
-
-<TabStack transition={{ variant: 'shared-axis', duration: 300, distance: 48, easing: Easing.bezier(0.2, 0, 0, 1) }} />
+<TabStack />                                                        // shared-axis, strong, reversed
+<TabStack transition={{ intensity: 'subtle', reverse: false }} />   // Material's own spec, natural side
+<TabStack transition={{ variant: 'fade-through', intensity: 50 }} /> // derived: 50dp, scale 0.72, 310 ms
+<TabStack transition={{ intensity: 'medium', duration: 320 }} />    // preset + one override
 ```
 
 Same transition for every tab: wrap it once and point each tab layout to it.
@@ -101,7 +104,7 @@ Same transition for every tab: wrap it once and point each tab layout to it.
 ```tsx
 // src/components/tab-layout.tsx
 export function TabLayout() {
-  return <TabStack transition={{ variant: 'shared-axis' }} />;
+  return <TabStack transition={{ intensity: 'medium' }} />;
 }
 // src/app/(home)/_layout.tsx
 export { TabLayout as default } from '@/components/tab-layout';
@@ -109,11 +112,31 @@ export { TabLayout as default } from '@/components/tab-layout';
 
 Custom tab layout: `useTabTransition(transition)` returns the animated style — put it on an `Animated.View` around your `Stack`.
 
+### Tuning
+
+`distance`, `startScale` and `duration` move together. Changing one alone is what makes a transition feel off: a big move that's too fast looks like a jump, a small one that's too slow looks sluggish. `intensity` keeps them in step — exported as `TAB_TRANSITION_INTENSITIES` and `tabTransitionTuning(distance)`.
+
+| `intensity` | `distance` | `startScale` | `duration` |
+|---|---|---|---|
+| `'subtle'` (Material spec, predates the rule) | `30` | `0.92` | `250` |
+| `'medium'` | `36` | `0.8` | `280` |
+| **`'strong'` (default)** | **`45`** | **`0.75`** | **`300`** |
+| `'max'` | `60` | `0.67` | `330` |
+| `number` (dp) | `n` | `1 − n / 180` | `200 + 2.2 × n` (rounded to 5 ms) |
+
+Rules of thumb when overriding:
+
+- **Duration follows amplitude**: `duration ≈ 200 + 2.2 × |distance|` ms. Past ~350 ms a tab switch feels slow — it's done dozens of times per session.
+- **Scale follows distance**: `startScale ≈ 1 − |distance| / 180`, so both variants have the same visual weight and you can swap `variant` without retuning.
+- **Keep the decelerate curve** (fast start, soft settle) whatever the amplitude; only change it for another decelerate (e.g. Material 3 standard decelerate `Easing.bezier(0, 0, 0, 1)`).
+- Opacity is fixed to finish at 80% of the motion, so the settle happens on solid content — nothing to tune.
+- Reduced motion is automatic (fade only) and ignores these values.
+
 **`TabConfig`**: `name` (`'(group)'`), `label`, `icon` (`sf` iOS SF Symbol, `md` Android Material Symbol).
 
 ## Notes
 
-- Tab switch: the outgoing tab is hidden natively, only the incoming one animates — which is why `shared-axis` is a short 30dp offset, not a full-width slide (there is no swipe between tabs either: native tab bars have none). Material recommends `fade-through` for bottom navigation; `shared-axis` suits tabs with a strong left-to-right order. The launch tab doesn't animate; every other tab animates from its first visit. Reduced motion: fade only, no scale; push / pop become `animation: 'fade'` (unless `screenOptions.animation` is set).
+- Tab switch: the outgoing tab is hidden natively, only the incoming one animates — which is why `shared-axis` is a short offset (45dp by default), not a full-width slide (there is no swipe between tabs either: native tab bars have none). Material recommends `fade-through` for bottom navigation; `shared-axis` suits tabs with a strong left-to-right order. The launch tab doesn't animate; every other tab animates from its first visit. Reduced motion: fade only, no scale; push / pop become `animation: 'fade'` (unless `screenOptions.animation` is set).
 - Stack transitions stay native on purpose (interactive back gesture, platform timing). `animationDuration` is iOS-only; on Android pick an `animation` value per screen, or `presentation: 'modal' | 'formSheet'`.
 - Judge smoothness on a release build (`npx expo run:android --variant release`), not Expo Go / dev.
 

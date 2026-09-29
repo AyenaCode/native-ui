@@ -8,5 +8,5 @@ export const TABS = [
   { name: '(profile)', label: 'Profile', icon: { sf: { default: 'person', selected: 'person.fill' }, md: 'person' } },
 ] as const satisfies readonly TabConfig[];
 
-/** Tab switch motion for every showcase tab. Try `'fade-through'` (default) or `'shared-axis'`. */
-export const TAB_TRANSITION = { variant: 'shared-axis' } as const satisfies TabTransition;
+/** Tab switch motion for every showcase tab. `{}` = component defaults (shared-axis, strong, reversed). Try `variant: 'fade-through'`, `intensity: 'subtle'`, `reverse: false`. */
+export const TAB_TRANSITION = {} as const satisfies TabTransition;

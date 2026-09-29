@@ -2,5 +2,10 @@ export { AppTabs } from './app-tabs';
 export type { AppTabsProps, TabConfig } from './app-tabs';
 export { TAB_STACK_OPTIONS, TabStack } from './tab-stack';
 export type { TabStackProps } from './tab-stack';
-export { useTabTransition } from './use-tab-transition';
-export type { TabTransition, TabTransitionVariant } from './use-tab-transition';
+export { TAB_TRANSITION_INTENSITIES, tabTransitionTuning, useTabTransition } from './use-tab-transition';
+export type {
+  TabTransition,
+  TabTransitionIntensityName,
+  TabTransitionTuning,
+  TabTransitionVariant,
+} from './use-tab-transition';

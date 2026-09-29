@@ -13,30 +13,68 @@ import {
 
 /**
  * Material motion for the incoming tab:
- * - `fade-through`: grows from `startScale` while fading in. Material's pattern for bottom navigation.
+ * - `fade-through`: grows from `startScale` while fading in (Material's pattern for bottom navigation).
  * - `shared-axis`: slides `distance` from the side of the tab bar it comes from while fading in (Material shared axis X).
  */
 export type TabTransitionVariant = 'fade-through' | 'shared-axis';
 
+/** Named amplitude preset. See `TAB_TRANSITION_INTENSITIES`. */
+export type TabTransitionIntensityName = 'subtle' | 'medium' | 'strong' | 'max';
+
+export type TabTransitionTuning = {
+  /** `shared-axis` slide length in dp. */
+  distance: number;
+  /** `fade-through` start scale, `0`–`1`. */
+  startScale: number;
+  /** Animation length in ms. */
+  duration: number;
+};
+
 export type TabTransition = {
-  /** Default `'fade-through'`. */
+  /** Default `'shared-axis'`. */
   variant?: TabTransitionVariant;
-  /** Animation length in ms. Default `250`. */
+  /**
+   * Sets `distance`, `startScale` and `duration` together, kept proportional. Default `'strong'`.
+   * A preset name, or a slide distance in dp (`0`–`90`) from which the other two are derived.
+   * `distance` / `startScale` / `duration` below override it one by one.
+   */
+  intensity?: TabTransitionIntensityName | number;
+  /** `shared-axis`: enter from the side opposite to the tab you come from. Default `true`. */
+  reverse?: boolean;
+  /** Overrides the intensity. Animation length in ms. */
   duration?: number;
-  /** Timing curve, e.g. `Easing.bezier(0.2, 0, 0, 1)`. Default: strong ease-out `Easing.bezier(0.23, 1, 0.32, 1)`. */
-  easing?: EasingFunction | EasingFunctionFactory;
-  /** `shared-axis` slide length in dp. Default `30` (Material). */
+  /** Overrides the intensity. `shared-axis` slide length in dp (negative also reverses). */
   distance?: number;
-  /** `fade-through` start scale, `0`–`1`. Default `0.92` (Material). */
+  /** Overrides the intensity. `fade-through` start scale, `0`–`1`. */
   startScale?: number;
+  /** Timing curve. Default: Material 3 emphasized decelerate `Easing.bezier(0.1, 0.7, 0.1, 1)`. Keep a decelerate (ease-out) curve. */
+  easing?: EasingFunction | EasingFunctionFactory;
   /** `false` switches tabs instantly (platform default). Default: on for Android (Material), off for iOS. */
   enabled?: boolean;
 };
 
-// Defaults from Material Components Android (MaterialFadeThrough / MaterialSharedAxis).
-const START_SCALE = 0.92;
-const SLIDE_DISTANCE = 30;
-const EASE_OUT = Easing.bezier(0.23, 1, 0.32, 1);
+const MAX_DISTANCE = 90;
+
+/**
+ * Proportional tuning for a slide distance: duration grows with the amplitude (≈ 200 + 2.2 × distance ms)
+ * and the scale matches the slide's visual weight (≈ 1 − distance / 180). Distance is clamped to `0`–`90` dp.
+ */
+export function tabTransitionTuning(distance: number): TabTransitionTuning {
+  const d = Math.min(Math.abs(distance), MAX_DISTANCE);
+  return { distance: d, startScale: Math.round((1 - d / 180) * 100) / 100, duration: Math.round((200 + 2.2 * d) / 5) * 5 };
+}
+
+/** Presets. `subtle` is Material's own spec (0.92 / 30dp), which predates the proportional rule. */
+export const TAB_TRANSITION_INTENSITIES = {
+  subtle: { distance: 30, startScale: 0.92, duration: 250 },
+  medium: tabTransitionTuning(36),
+  strong: tabTransitionTuning(45),
+  max: tabTransitionTuning(60),
+} as const satisfies Record<TabTransitionIntensityName, TabTransitionTuning>;
+
+const EASE_DECELERATE = Easing.bezier(0.1, 0.7, 0.1, 1); // Material 3 emphasized decelerate (entering elements)
+// Opacity reaches 1 at 80% of the motion, so the long settle happens on solid content, not a ghost.
+const FADE_END = 0.8;
 // RTL: the tab bar is mirrored, so is the side a tab comes from.
 const SIDE = I18nManager.isRTL ? -1 : 1;
 
@@ -49,13 +87,18 @@ const lastFocusedIndex = new Map<string, number>();
  * Reduced motion: opacity only. Apply the returned style to an `Animated.View` wrapping the tab content.
  */
 export function useTabTransition({
-  variant = 'fade-through',
-  duration = 250,
-  easing = EASE_OUT,
-  distance = SLIDE_DISTANCE,
-  startScale = START_SCALE,
+  variant = 'shared-axis',
+  intensity = 'strong',
+  reverse = true,
+  easing = EASE_DECELERATE,
   enabled = process.env.EXPO_OS === 'android',
+  ...overrides
 }: TabTransition = {}) {
+  const preset = typeof intensity === 'number' ? tabTransitionTuning(intensity) : TAB_TRANSITION_INTENSITIES[intensity];
+  const duration = overrides.duration ?? preset.duration;
+  const distance = (overrides.distance ?? preset.distance) * (reverse ? -1 : 1);
+  const scale = Math.min(Math.max(overrides.startScale ?? preset.startScale, 0), 1);
+
   const reduced = useReducedMotion();
   const navigation = useNavigation();
   // NativeTabs mounts every tab at launch: only the launch tab starts visible, the others fade in on first visit.
@@ -87,14 +130,12 @@ export function useTabTransition({
     }, [enabled, navigation, progress, direction]),
   );
 
-  const scale = Math.min(Math.max(startScale, 0), 1);
-
   return useAnimatedStyle(() => {
     const p = progress.get();
     const moving = !reduced;
     // Same transform shape every frame: identity values instead of adding / removing entries.
     return {
-      opacity: p,
+      opacity: Math.min(p / FADE_END, 1),
       transform: [
         { translateX: moving && variant === 'shared-axis' ? direction.get() * distance * (1 - p) : 0 },
         { scale: moving && variant === 'fade-through' ? scale + (1 - scale) * p : 1 },
