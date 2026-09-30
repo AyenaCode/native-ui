@@ -1,5 +1,5 @@
 import { useFocusEffect, useNavigation } from 'expo-router';
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import { use, useCallback, useLayoutEffect, useRef } from 'react';
 import { I18nManager } from 'react-native';
 import {
   Easing,
@@ -10,6 +10,8 @@ import {
   type EasingFunction,
   type EasingFunctionFactory,
 } from 'react-native-reanimated';
+
+import { SYNC_EASING, TabMotionContext } from './tab-motion';
 
 /**
  * Material motion for the incoming tab:
@@ -47,7 +49,10 @@ export type TabTransition = {
   distance?: number;
   /** Overrides the intensity. `fade-through` start scale, `0`–`1`. */
   startScale?: number;
-  /** Timing curve. Default: Material 3 emphasized decelerate `Easing.bezier(0.1, 0.7, 0.1, 1)`. Keep a decelerate (ease-out) curve. */
+  /**
+   * Timing curve. Default: Material 3 emphasized decelerate `Easing.bezier(0.1, 0.7, 0.1, 1)`;
+   * with `AppTabs slidingIndicator`, `Easing.bezier(0, 0, 0.2, 1)` to match the indicator. Keep a decelerate (ease-out) curve.
+   */
   easing?: EasingFunction | EasingFunctionFactory;
   /** `false` switches tabs instantly (platform default). Default: on for Android (Material), off for iOS. */
   enabled?: boolean;
@@ -81,50 +86,67 @@ const SIDE = I18nManager.isRTL ? -1 : 1;
 // Last focused tab index per tab navigator, to know which side the incoming tab comes from.
 const lastFocusedIndex = new Map<string, number>();
 
+/** Resolved values of a transition: `intensity` preset, then direct overrides. Shared by the screens and the sliding indicator. */
+export function resolveTabTransition(transition: TabTransition = {}) {
+  const { intensity = 'strong', reverse = true } = transition;
+  const preset = typeof intensity === 'number' ? tabTransitionTuning(intensity) : TAB_TRANSITION_INTENSITIES[intensity];
+  return {
+    duration: transition.duration ?? preset.duration,
+    distance: (transition.distance ?? preset.distance) * (reverse ? -1 : 1),
+    startScale: Math.min(Math.max(transition.startScale ?? preset.startScale, 0), 1),
+  };
+}
+
 /**
  * Material tab transition played each time the tab gains focus, on the UI thread.
  * The outgoing tab is hidden natively, so only the incoming one animates. The launch tab doesn't animate.
  * Reduced motion: opacity only. Apply the returned style to an `Animated.View` wrapping the tab content.
+ * Defaults come from `AppTabs transition`; the argument overrides them field by field.
  */
-export function useTabTransition({
-  variant = 'shared-axis',
-  intensity = 'strong',
-  reverse = true,
-  easing = EASE_DECELERATE,
-  enabled = process.env.EXPO_OS === 'android',
-  ...overrides
-}: TabTransition = {}) {
-  const preset = typeof intensity === 'number' ? tabTransitionTuning(intensity) : TAB_TRANSITION_INTENSITIES[intensity];
-  const duration = overrides.duration ?? preset.duration;
-  const distance = (overrides.distance ?? preset.distance) * (reverse ? -1 : 1);
-  const scale = Math.min(Math.max(overrides.startScale ?? preset.startScale, 0), 1);
+export function useTabTransition(transition?: TabTransition) {
+  const motion = use(TabMotionContext);
+  const merged = { ...motion.transition, ...transition };
+  const {
+    variant = 'shared-axis',
+    easing = motion.sliding ? SYNC_EASING : EASE_DECELERATE,
+    enabled = process.env.EXPO_OS === 'android',
+  } = merged;
+  const { duration, distance, startScale: scale } = resolveTabTransition(merged);
 
   const reduced = useReducedMotion();
   const navigation = useNavigation();
-  // NativeTabs mounts every tab at launch: only the launch tab starts visible, the others fade in on first visit.
-  const progress = useSharedValue(!enabled || navigation.isFocused() ? 1 : 0);
+  // Only the first tab ever focused in this navigator starts visible (the launch tab). The others start hidden,
+  // whether they mount at launch (NativeTabs) or on first visit (headless tabs, lazy), and fade in on focus.
+  const navigatorKey = navigation.getState()?.key;
+  const progress = useSharedValue(
+    !enabled || (navigation.isFocused() && navigatorKey !== undefined && !lastFocusedIndex.has(navigatorKey)) ? 1 : 0,
+  );
   // -1 = comes from the left, 1 = from the right, 0 = no side (launch, same tab).
   const direction = useSharedValue(0);
 
-  // Latest duration / easing, read on focus without re-running the focus effect
+  // Latest duration / easing / order, read on focus without re-running the focus effect
   // (an inline `Easing.bezier()` is a new object each render and would replay the animation).
-  const timing = useRef({ duration, easing });
+  const latest = useRef({ duration, easing, order: motion.order });
   useLayoutEffect(() => {
-    timing.current = { duration, easing };
+    latest.current = { duration, easing, order: motion.order };
   });
 
   useFocusEffect(
     useCallback(() => {
       const state = navigation.getState();
+      const { duration, easing, order } = latest.current;
+      // Position in the tab bar, not in the navigator (headless tabs sort their routes).
+      const position = state ? order.indexOf(String(state.routes[state.index]?.name)) : -1;
+      const index = position === -1 ? (state?.index ?? 0) : position;
       const previous = state && lastFocusedIndex.get(state.key);
-      if (state) lastFocusedIndex.set(state.key, state.index);
+      if (state) lastFocusedIndex.set(state.key, index);
 
       if (!enabled) {
         progress.set(1);
         return;
       }
-      direction.set(!state || previous === undefined ? 0 : Math.sign(state.index - previous) * SIDE);
-      progress.set(withTiming(1, timing.current));
+      direction.set(previous === undefined ? 0 : Math.sign(index - previous) * SIDE);
+      progress.set(withTiming(1, { duration, easing }));
       // Blurred tab is off-screen: reset now so the next focus starts from the first frame.
       return () => progress.set(0);
     }, [enabled, navigation, progress, direction]),

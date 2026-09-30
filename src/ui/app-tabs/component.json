@@ -1,10 +1,13 @@
 {
   "name": "app-tabs",
-  "description": "Native tab bar from a config (Liquid Glass iOS 26+, Material 3 Android) + native stack per tab, UI-thread Material tab transitions (shared axis, fade-through) with proportional intensity presets",
+  "description": "Native tab bar from a config (Liquid Glass iOS 26+, Material 3 Android) + native stack per tab, UI-thread Material tab transitions (shared axis, fade-through) with proportional intensity presets, optional Compose bar with sliding indicator (Android)",
   "dependencies": [
     "expo-router",
     "react-native-reanimated",
-    "react-native-worklets"
+    "react-native-worklets",
+    "@expo/ui",
+    "expo-symbols",
+    "react-native-safe-area-context"
   ],
   "registryDependencies": [],
   "minSdk": 57

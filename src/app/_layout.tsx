@@ -16,7 +16,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <ThemeProvider value={NavigationThemes[scheme]}>
-        <AppTabs tabs={TABS} badges={{ '(activity)': unread }} tintColor={Colors[scheme].accent} />
+        <AppTabs tabs={TABS} badges={{ '(activity)': unread }} tintColor={Colors[scheme].accent} slidingIndicator />
         <Toaster />
       </ThemeProvider>
     </GestureHandlerRootView>

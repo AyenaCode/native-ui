@@ -29,7 +29,7 @@ npx @ay-code/native-ui diff <component...>     # your copy vs the latest version
 
 | Name | What |
 |---|---|
-| `app-tabs` | Native tab bar from a config (Liquid Glass iOS 26+, Material 3 Android) + native stack per tab, UI-thread Material tab transitions (shared axis, fade-through) with proportional intensity presets |
+| `app-tabs` | Native tab bar from a config (Liquid Glass iOS 26+, Material 3 Android) + native stack per tab, UI-thread Material tab transitions (shared axis, fade-through) with proportional intensity presets, optional Compose bar with sliding indicator (Android) |
 | `overflow-menu` | Native `…` / `⋮` header menu: actions, checkmarks, sections, submenus |
 | `pressable-scale` | Press feedback: subtle scale on press-in (UI thread), optional haptic |
 | `swipeable-row` | Swipe-to-reveal row actions, one open row at a time, a11y actions |
